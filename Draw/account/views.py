@@ -14,3 +14,5 @@ class KakaoSignupView(View):
 
         return redirect(f"{kakao_api}&client_id={client_id}&redirect_url={redirect_url}")
         '''
+
+ 
