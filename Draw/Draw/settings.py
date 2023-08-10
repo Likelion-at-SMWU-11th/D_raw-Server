@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os, json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,12 +47,33 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
     'allauth.socialaccount.providers.google',
+    'rest_framework',
 ]
+secret_file = os.path.join(BASE_DIR, 'secrets.json') #json 파일 위치를 명시
+secrets = None
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
 
-SITE_ID = 1 #django admin 사이트 접속 시 에러나는 것 방지
+SECRET_KEY = secrets['SECRET_KEY']
+
+# 카카오 키들은 나중에 account.views 에서 쓰일 예정
+
+SOCIAL_OUTH_CONFIG = {
+    'KAKAO_REST_API_KEY':secrets['KAKAO_REST_API_KEY'],
+    'KAKAO_REDIRECT_URI':secrets['KAKAO_REDIRECT_URI'],
+    'KAKAO_SECRET_KEY': secrets['KAKAO_SECRET_KEY']
+}
+
+kakao_login_uri = "https://kauth.kakao.com/oauth/authorize"
+kakao_token_uri = "https://kauth.kakao.com/oauth/token"
+kakao_profile_uri = "https://kapi.kakao.com/v2/user/me"
+
+SITE_ID = 2 #django admin 사이트 접속 시 에러나는 것 방지
+
 LOGIN_REDIRECT_URL ='/' #로그인 후 리다이렉트 될 경로
 #ACCOUNT_LOGOUT_REDIRECT_URL = reverse_lazy('account:login')
 ACCOUNT_LOGOUT_ON_GET = True
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
