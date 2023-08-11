@@ -1,19 +1,16 @@
-<!doctype html>
-<html lang="ko">
-  <head>
-  <meta charset="utf-8">
-    <title>HTML</title>
-    <style>
-      * {
-        font-size: 16px;
-        font-family: Consolas, sans-serif;
-      }
-    </style>
-  </head>
-  <body>
-    <form>
-      <p><input type="date"></p>
-      <p><input type="submit" value="Submit"></p>
-    </form>
-  </body>
+<html>
+<head></head>
+<body>
+  <div class="regibox">
+      <form method="POST" action="match_date">
+          {% csrf_token %}
+          <input type="date" id="date" name="date" value="2023-08-06">
+          <button type="submit" value="submit">매칭 날짜 선택</button>
+          <br><br>
+          <input type="time" id="time" value="00:00:00">
+          <input type="submit" value="시작 시간을 선택하세요">
+      </form>
+  </div>
+  <br><br>
+</body>
 </html>

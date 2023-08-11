@@ -1,4 +1,4 @@
 from django.shortcuts import render
 
 def match(request):
-    pass
+    return render(request, 'match.html')
