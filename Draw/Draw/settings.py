@@ -41,13 +41,21 @@ INSTALLED_APPS = [
     'main',
     'match',
     #'account',
+
+    #django-rest-auth
+    'rest_framework',
+    'rest_framework.authtoken',
+
+    #django-allauth
     'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+
+    #provider
     'allauth.socialaccount.providers.kakao',
     'allauth.socialaccount.providers.google',
-    'rest_framework',
+
 ]
 secret_file = os.path.join(BASE_DIR, 'secrets.json') #json 파일 위치를 명시
 secrets = None
@@ -165,3 +173,13 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+
+SOCIALACCOUNT_PROVIDERS = {
+    'kakao': {
+        'APP': {
+            'client_id': 'd8fd6327b24b302b1d20f0690b10d3f4',
+            'secret': 948052,
+            'key': ''
+        }
+    }
+}
