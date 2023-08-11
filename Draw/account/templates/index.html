@@ -20,6 +20,16 @@
 </html> -->
 
 
+{% comment %} start social {% endcomment %}
+{% load socialaccount %}
+<div>
+    {% if user.is_authenticated %}
+        <a href="/accounts/logout" type="button" class="h1">Logout</a>   
+    {% else %}                
+        <a href="{% provider_login_url 'naver'%}"> NAVER Social Login</a>        
+    {% endif %}
+</div>
+{% comment %} end social {% endcomment %}
 
 {% if check %}
     <div>
@@ -29,7 +39,6 @@
         </form>
     </div>
 {% else %}
-
     <div>
         <h1>카카오 로그인</h1>
         <form action="/kakaoLoginLogic" method="GET">

@@ -9,8 +9,7 @@ from account import views
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    #계정 관련
-    path('account/', include('account.urls')),
+    #kakao 계정 관련
     path('account/', include('allauth.urls')),
     path('', views.index, name='kakao'),
     path('kakaoLoginLogic/', views.kakaoLoginLogic),

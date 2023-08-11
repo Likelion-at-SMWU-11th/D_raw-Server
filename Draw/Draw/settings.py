@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     #provider
     'allauth.socialaccount.providers.kakao',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.naver',
 
 ]
 secret_file = os.path.join(BASE_DIR, 'secrets.json') #json 파일 위치를 명시
@@ -147,7 +148,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ko'
 
 TIME_ZONE = 'UTC'
 
@@ -179,6 +180,13 @@ SOCIALACCOUNT_PROVIDERS = {
         'APP': {
             'client_id': 'd8fd6327b24b302b1d20f0690b10d3f4',
             'secret': 948052,
+            'key': ''
+        }
+    },
+    'naver': {
+        'APP': {
+            'client_id': '36urmSUW7v33nN1aZBMR',
+            'secret': 'tbjry4HCn3',
             'key': ''
         }
     }
