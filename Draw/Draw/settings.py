@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os, json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,8 +40,49 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'match',
-    'account',
+    #'account',
+
+    #django-rest-auth
+    'rest_framework',
+    'rest_framework.authtoken',
+
+    #django-allauth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+
+    #provider
+    'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.naver',
+
 ]
+secret_file = os.path.join(BASE_DIR, 'secrets.json') #json 파일 위치를 명시
+secrets = None
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
+
+SECRET_KEY = secrets['SECRET_KEY']
+
+# 카카오 키들은 나중에 account.views 에서 쓰일 예정
+
+SOCIAL_OUTH_CONFIG = {
+    'KAKAO_REST_API_KEY':secrets['KAKAO_REST_API_KEY'],
+    'KAKAO_REDIRECT_URI':secrets['KAKAO_REDIRECT_URI'],
+    'KAKAO_SECRET_KEY': secrets['KAKAO_SECRET_KEY']
+}
+
+kakao_login_uri = "https://kauth.kakao.com/oauth/authorize"
+kakao_token_uri = "https://kauth.kakao.com/oauth/token"
+kakao_profile_uri = "https://kapi.kakao.com/v2/user/me"
+
+SITE_ID = 2 #django admin 사이트 접속 시 에러나는 것 방지
+
+LOGIN_REDIRECT_URL ='/' #로그인 후 리다이렉트 될 경로
+#ACCOUNT_LOGOUT_REDIRECT_URL = reverse_lazy('account:login')
+ACCOUNT_LOGOUT_ON_GET = True
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -57,7 +99,7 @@ ROOT_URLCONF = 'Draw.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['account/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -124,3 +166,37 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    'kakao': {
+        'APP': {
+            'client_id': 'd8fd6327b24b302b1d20f0690b10d3f4',
+            'secret': 948052,
+            'key': ''
+        }
+    },
+    'naver': {
+        'APP': {
+            'client_id': '36urmSUW7v33nN1aZBMR',
+            'secret': 'tbjry4HCn3',
+            'key': ''
+        }
+    },
+    'google': {
+        'SCOPE': [
+            'profile', 
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online'
+        }
+    }
+}
