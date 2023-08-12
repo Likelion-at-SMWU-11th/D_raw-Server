@@ -1,11 +1,28 @@
 from django.db import models
-from django import forms
 
+# 매칭 신청 모델
 class MatchUser(models.Model):
-    date = models.DateField(verbose_name='date', auto_now_add=True)
-    start_time = models.DateTimeField(verbose_name='start_time', auto_now_add=True)
-    finish_time = models.DateTimeField(verbose_name='finish_time', auto_now_add=True)
-    
+    # 시간
+    start_time_period = models.CharField(
+        max_length=2,
+        choices=[
+            ('AM', '오전'),
+            ('PM', '오후')
+        ],
+        default=''
+    )
+    start_hour = models.IntegerField(choices=[(i, i) for i in range(1, 13)])
+
+    finish_time_period = models.CharField(
+        max_length=2,
+        choices=[
+            ('AM', '오전'),
+            ('PM', '오후')
+        ],
+        default=''
+    )
+    finish_hour = models.IntegerField(choices=[(i, i) for i in range(1, 13)])
+
     # 장소
     place = models.TextField(verbose_name='place')
 
@@ -16,13 +33,13 @@ class MatchUser(models.Model):
         ('H', '중증 장애'),
     ]
     blind = models.CharField(
-        choices=BLIND_CHOICES, max_length=3, null='없음'
+        choices=BLIND_CHOICES, max_length=3, default='없음'
     )
 
     # 출생년도 선택 리스트
     birth = models.PositiveIntegerField(
         verbose_name='Birth',
-        choices=[(year, year) for year in range(1905, 2005)],
+        choices=[(year, year) for year in range(1915, 2005)],
     )
 
     # 성별 선택 리스트
@@ -31,18 +48,17 @@ class MatchUser(models.Model):
         ("M", "남성"),
     ]
     gender = models.CharField(
-        choices=GENDER_CHOICES, max_length=2, blank=True
+        choices=GENDER_CHOICES, max_length=2, blank=True, default='여성'
     )
 
-class PreferUser(models.Model):
-    # 선호하는 성별
-    GENDER_CHOICES = [
+    # 선호하는 성별 선택 리스트
+    PREFER_GENDER_CHOICES = [
         ("F", "여성"),
         ("M", "남성"),
         ("N", "모두 가능"),
     ]
-    gender = models.CharField(
-        choices=GENDER_CHOICES, max_length=3, blank=True
+    prefer_gender = models.CharField(
+        choices=PREFER_GENDER_CHOICES, max_length=5, blank=True, default='여성'
     )
 
     # 집중 케어 필요 항목
@@ -56,7 +72,7 @@ class PreferUser(models.Model):
     ]
 
     list = models.CharField(
-        choices=LIST_CHOICES, max_length=9
+        choices=LIST_CHOICES, max_length=9, default=''
     )
 
     # 안내사 매칭 추가 문의
@@ -66,8 +82,8 @@ class PreferUser(models.Model):
     ]
 
     plus = models.CharField(
-        choices=PLUS_CHOICES, max_length=2
+        choices=PLUS_CHOICES, max_length=2, default=''
     )
 
     # 그 외 유의사항
-    care = models.CharField(max_length=300, null=True)
+    care = models.CharField(max_length=300, blank=True)

@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.kakao',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.naver',
-
 ]
 secret_file = os.path.join(BASE_DIR, 'secrets.json') #json 파일 위치를 명시
 secrets = None
@@ -147,6 +146,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
+
 
 LANGUAGE_CODE = 'ko-kr' # 한국 시간으로 설정
 
