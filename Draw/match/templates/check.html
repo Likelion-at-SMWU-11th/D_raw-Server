@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="{% url 'quick' %}", method="GET">
+        <input type="submit", value="빠르게 찾기">
+    </form>
+    <form action="{% url 'profile' %}", method="GET">
+        <input type="submit", value="프로필 보고 찾기">
+    </form>
+</body>
+</html>
