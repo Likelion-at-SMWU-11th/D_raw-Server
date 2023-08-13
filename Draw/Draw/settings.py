@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'match',
-    #'account',
+    'account',
 
     #django-rest-auth
     'rest_framework',
@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     #django-allauth
     'django.contrib.sites',
     'allauth',
-    'allauth.account',
+    #'allauth.account',
     'allauth.socialaccount',
 
     #provider
