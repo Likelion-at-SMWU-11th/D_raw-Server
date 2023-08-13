@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.contrib.auth import get_user_model
+from .forms import GuideForm, GuideCreateForm
+from .models import Guide
 import requests
-import json
-from django.template import loader
-from django.http import HttpResponse, JsonResponse
 
-
+# 회원가입 관련 View
 def index(request):
     _context = {'check':False}
     if request.session.get('access_token'):
@@ -59,3 +60,33 @@ def methodsCheck(request, id):
         print(f"POST Dynamic Path : {id}")
         return HttpResponse("POST Request.", content_type="text/plain")
     return render(request, 'methodGet.html')
+
+# 안내사 관련 View
+def BestGuide(request, pk):
+    User = get_user_model()
+    context = {
+        'user' : User,
+
+    }
+    rate = 0
+    return render(request, 'BestGuide.html', context)
+
+def guide_create_form_view(request):
+    if request.method == 'GET':
+        form = GuideCreateForm()
+        context = {'form' : form}
+        return render(request, 'account/GuideCreate.html', context)
+    
+    else:
+        form = GuideCreateForm(request.POST)
+
+        if form.is_valid():
+            Guide.objects.create(
+                name = form.cleaned_data['name'],
+                age = form.cleaned_data['age'],
+                rate = form.cleaned_data['rate'],
+                career = form.cleaned_data['career'],
+            )
+        else:
+            redirect('guidecreate')
+        return redirect('index')
