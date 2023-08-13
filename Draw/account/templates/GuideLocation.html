@@ -4,20 +4,17 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guide Create</title>
+    <title>Guide Location</title>
 </head>
 <body>
-    <h1> Guide Create 화면 </h1>
+    <h1>활동지역 추가하기</h1>
     <form action="" method="POST" enctype="multipart/form-data">
     <div>
         {% csrf_token %}
         {{ form.as_p }}
     </div>
     <div>
-        <input type="submit">
-    </div>
-    <div>
-        <a href="http://127.0.0.1:8000/account/guidelocation">활동지역 추가하기</a>
+        <input type ="submit">
     </div>
 </form>
 </body>
