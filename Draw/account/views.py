@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
-from .forms import GuideForm, GuideCreateForm
+from .forms import GuideCreateForm, GuideLocationForm
 from .models import Guide
 import requests
 
@@ -75,7 +75,7 @@ def guide_create_form_view(request):
     if request.method == 'GET':
         form = GuideCreateForm()
         context = {'form' : form}
-        return render(request, 'account/GuideCreate.html', context)
+        return render(request, 'GuideCreate.html', context)
     
     else:
         form = GuideCreateForm(request.POST)
@@ -88,5 +88,22 @@ def guide_create_form_view(request):
                 career = form.cleaned_data['career'],
             )
         else:
-            redirect('guidecreate')
-        return redirect('index')
+            return render(request, 'GuideCreate.html')
+        return render(request, 'GuideCreate.html')
+
+def guide_location_form_view(request):
+    if request.method == 'GET':
+        form = GuideLocationForm()
+        context = {'form' : form}
+        return render(request, 'GuideLocation.html', context)
+    
+    else:
+        form = GuideLocationForm(request.POST)
+
+        if form.is_valid():
+            GuideLocationForm.objects.create(
+                location = form.cleaned_data['locaton'],
+            )
+        else:
+            return render(request, 'GuideLocation.html')
+        return render(request, 'GuideLocation.html')
