@@ -6,11 +6,11 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="{% url 'quick' %}", method="GET">
-        <input type="submit", value="빠르게 찾기">
+    <form action="{% url 'quick' %}", method="get">
+        <input type="submit", value="빠르게 찾기", name="quick">
     </form>
-    <form action="{% url 'profile' %}", method="GET">
-        <input type="submit", value="프로필 보고 찾기">
+    <form action="{% url 'profile' %}", method="get">
+        <input type="submit", value="프로필 보고 찾기", name="profile">
     </form>
 </body>
 </html>
