@@ -10,13 +10,12 @@ class Guide(models.Model):
         ('3','6개월~1년'),
         ('4', '1년 이상'),
     ]
-    name = models.CharField(verbose_name='안내사 이름', max_length=5)
-    age = models.IntegerField(verbose_name='나이')
-    #rate = models.IntegerField(verbose_name='받은 칭찬도장 개수')
-    #start_date = models.DateTimeField(verbose_name='안내사 첫 시작일')
-    career = models.IntegerField(verbose_name='안내사 경력', choices=TERM_CHOICES)
+    name = models.CharField(verbose_name='안내사 이름', max_length=5, null=True, default='')
+    age = models.IntegerField(verbose_name='나이', null=True)
+    rate = models.IntegerField(verbose_name='받은 칭찬도장 개수', null=True, default=0)
+    start_date = models.DateTimeField(verbose_name='안내사 첫 시작일', null=True, default='')
+    career = models.CharField(verbose_name='안내사 경력', choices=TERM_CHOICES, max_length=20, null=True, default='')
 
-class GuideLocation(models.Model):
     LOCATION_CHOICES = [ # 안내사 활동 지역 선택지
         ('1', '서울특별시'),
         ('2', '부산광역시'),
@@ -37,4 +36,4 @@ class GuideLocation(models.Model):
         ('17', '제주특별자치도'),
     ]
     
-    location = models.IntegerField(verbose_name='안내사 활동 가능 지역', choices=LOCATION_CHOICES)
+    location = models.CharField(verbose_name='안내사 활동 가능 지역', choices=LOCATION_CHOICES, max_length=20, null=True, default='')
