@@ -21,12 +21,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='guide',
             name='rate',
-            field=models.IntegerField(default='', null=True, verbose_name='받은 칭찬도장 개수'),
+            field=models.IntegerField(default=0, null=True, verbose_name='받은 칭찬도장 개수'),
         ),
         migrations.AddField(
             model_name='guide',
             name='start_date',
-            field=models.DateTimeField(default='', null=True, verbose_name='안내사 첫 시작일'),
+            field=models.DateTimeField(null=True, verbose_name='안내사 첫 시작일'),
         ),
         migrations.AlterField(
             model_name='guide',
