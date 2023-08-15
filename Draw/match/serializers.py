@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
-from .models import MatchUser
+from account.models import Guide
 
-class MatchModelSerializer(ModelSerializer):
+class GuideModelSerializer(ModelSerializer):
     class Meta:
-        model = MatchUser
+        model = Guide
         fields = '__all__'
