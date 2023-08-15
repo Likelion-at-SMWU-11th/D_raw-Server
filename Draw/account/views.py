@@ -61,12 +61,12 @@ def methodsCheck(request, id):
         return HttpResponse("POST Request.", content_type="text/plain")
     return render(request, 'methodGet.html')
 
+
 # 안내사 관련 View
 def BestGuide(request, pk):
     User = get_user_model()
     context = {
         'user' : User,
-
     }
     rate = 0
     return render(request, 'BestGuide.html', context)
@@ -81,16 +81,12 @@ def guide_create_form_view(request):
         form = GuideCreateForm(request.POST)
 
         if form.is_valid():
-            Guide.objects.create(
-                name = form.cleaned_data['name'],
-                age = form.cleaned_data['age'],
-                rate = form.cleaned_data['rate'],
-                career = form.cleaned_data['career'],
-                location = form.cleaned_data['locaton'],
-            )
+            guide = form.save(commit=False)
+            guide.rate = int(form.cleaned_data['rate'])  # 입력된 rate 데이터를 숫자로 변환하여 할당
+            guide.save()
+            return render(request, 'index.html')
         else:
             return render(request, 'GuideCreate.html')
-        return render(request, 'GuideCreate.html')
 
 def guide_location_form_view(request):
     if request.method == 'GET':
@@ -99,16 +95,13 @@ def guide_location_form_view(request):
         return render(request, 'GuideLocation.html', context)
     
     else:
+        
         form = GuideCreateForm(request.POST)
 
         if form.is_valid():
-            Guide.objects.create(
-                name = form.cleaned_data['name'],
-                age = form.cleaned_data['age'],
-                rate = form.cleaned_data['rate'],
-                career = form.cleaned_data['career'],
-                location = form.cleaned_data['locaton'],
-            )
+            guide = form.save(commit=False)
+            guide.rate = int(form.cleaned_data['rate'])  # 입력된 rate 데이터를 숫자로 변환하여 할당
+            guide.save()
+            return render(request, 'index.html')
         else:
             return render(request, 'GuideLocation.html')
-        return render(request, 'GuideLocation.html')
