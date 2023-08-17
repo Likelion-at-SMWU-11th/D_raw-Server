@@ -1,7 +1,17 @@
 from django.db import models
 
+
 # 매칭 신청 모델
 class MatchUser(models.Model):
+    # 방법 선택
+    METHOD_CHOICE = [
+        ('quick', '빠르게찾기'),
+        ('profile', '프로필보고찾기'),
+    ]
+    method = models.CharField(
+        choices=METHOD_CHOICE, max_length=7, default='없음'
+    )
+
     # 시간
     start_time_period = models.CharField(
         max_length=2,
