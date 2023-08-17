@@ -9,9 +9,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from Draw.settings import SOCIAL_OUTH_CONFIG
 import requests, json
-from .models import User
+from .models import User, Guide
 from django.contrib.auth import authenticate
-from .serializers import SignupSerializer, UserSerializer
+from .serializers import SignupSerializer, UserSerializer, BestGuideSerializer
+from .forms import GuideCreateForm, GuideProfileEditForm
 
 class JWTSignupView(APIView):
     def post(self, request):
@@ -208,7 +209,7 @@ def methodsCheck(request, id):
         return HttpResponse("POST Request.", content_type="text/plain")
     return render(request, 'methodGet.html')
 '''
-'''
+
 ## 안내사 관련 View
 #우수 안내사 View
 def BestGuide(request):
@@ -233,7 +234,7 @@ def guide_create_form_view(request):
             guide = form.save(commit=False)
             guide.rate = int(form.cleaned_data['rate'])  # 입력된 rate 데이터를 숫자로 변환하여 할당
             guide.save()
-            return render(request, 'index.html')
+            return render(request, 'GuideProfile.html')
         else:
             return render(request, 'GuideCreate.html')
 
@@ -245,7 +246,6 @@ def guide_location_form_view(request):
         return render(request, 'GuideLocation.html', context)
     
     else:
-        
         form = GuideCreateForm(request.POST)
 
         if form.is_valid():
@@ -261,7 +261,22 @@ def guide_profile_view(request):
         return render(request, 'GuideProfile.html')
 
 # 안내사 프로필 수정 View
-def guide_profile_edit_view(request):
-    pass
+def guide_profile_edit_view(request, guide_id):
+    guide = Guide.objects.get(pk=guide_id)
 
-'''
+    if request.method == 'POST':
+        form = GuideProfileEditForm(request.POST)
+        if form.is_valid():
+            guide.start_date = form.cleaned_data['start_date']
+            guide.career = form.cleaned_data['career']
+            guide.save()
+            return redirect('guide_profile', guide_id=guide.id)  # Redirect to the guide profile page
+    else:
+        form = GuideProfileEditForm(initial={'start_date': guide.start_date, 'career': guide.career})
+
+    context = {
+        'form': form,
+        'guide': guide,
+    }
+
+    return render(request, 'guide_profile_edit.html', context)
