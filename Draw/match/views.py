@@ -4,9 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
 from .models import MatchUser
-from account.models import Guide
+from account.models import User
 from .forms import MatchBasedForm
-from .serializers import GuideModelSerializer
+from .serializers import UserModelSeirliazer
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -74,16 +74,18 @@ class ProfileList(APIView):
             Guide.objects.filter(gender='남성')
 
         if adult == '성인':
-            pass
+            Guide.objects.filter(age>'20')
+        else:
+            Guide.objects.all()
 
         if career ==  '1년 이상':
-            pass
+            Guide.objects.filter(career=1)
         elif career == '2년 이상':
-            pass
+            Guide.objects.filter(career=2)
         elif career == '3년 이상':
-            pass
+            Guide.objects.filter(career=3)
         else: # 상관없음
-            pass
+            Guide.objects.all()
 
 # 프로필 상세보기
 class ProfileDetailList(APIView):
@@ -105,10 +107,26 @@ def search(request):
     # else:
     return render(request, 'search.html')
 
-# 내 매칭-이용자
-def mypage_user(request):
-    pass
+# 내 매칭-이용자가 보는 화면
+class GuideList(APIView):
+    def get_object(self, pk):
+        try:
+            return Guide.objects.get(pk=pk)
+        except Guide.DoesNotExist:
+            raise Http404
+    def get(self, request, pk):
+        guide = self.get_object(pk)
+        serializer = GuideModelSerializer(guide)
+        return Response(serializer.data)
 
-# 내 매칭-안내사
-def mypage_guide(request):
-    pass
+# 내 매칭-안내사가 보는 화면
+class UserList(APIView):
+    def get_object(self, pk):
+        try:
+            return Guide.objects.get(pk=pk)
+        except Guide.DoesNotExist:
+            raise Http404
+    def get(self, request, pk):
+        guide = self.get_object(pk)
+        serializer = GuideModelSerializer(guide)
+        return Response(serializer.data)

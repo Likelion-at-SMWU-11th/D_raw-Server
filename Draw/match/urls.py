@@ -10,6 +10,6 @@ urlpatterns = [
     path('quick/', views.QuickList.as_view(), name='quick'),
     path('profile/', views.ProfileList.as_view(), name='profile'),
     path('profile/<int:pk>/', views.ProfileDetailList.as_view()),
-    path('mypage/user', views.mypage_user, name='mypage-user'),
-    path('mypage/guide', views.mypage_guide, name='mypage-guide'),
+    path('mypage/user', views.GuideList, name='mypage-user'),
+    path('mypage/guide', views.UserList, name='mypage-guide'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
