@@ -13,6 +13,21 @@ from .models import User, Guide
 from django.contrib.auth import authenticate
 from .serializers import SignupSerializer, UserSerializer, BestGuideSerializer
 from .forms import GuideCreateForm, GuideProfileEditForm
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.contrib.auth import login
+from django.core.files.base import ContentFile
+from rest_framework import status
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from Draw.settings import SOCIAL_OUTH_CONFIG
+import requests, json
+from .models import User
+from django.contrib.auth import authenticate
+
+from .serializers import SignupSerializer, UserSerializer
 
 class JWTSignupView(APIView):
     def post(self, request):
@@ -90,6 +105,7 @@ class KakaoCallBackView(APIView):
         profile_req = requests.get(
             "https://kapi.kakao.com/v2/user/me", headers={"Authorization":f"Bearer {access_token}"}
         )
+   
         profile_json = profile_req.json()
         email = profile_json.get("kakao_account").get("email") # email 값
         properties = profile_json.get("kakao_account").get("profile")
@@ -132,7 +148,6 @@ class KakaoCallBackView(APIView):
         res.set_cookie("refresh", jwt_refresh_token, httponly=True)
         
         return res
-
    
 '''
 # 회원가입 관련 View
@@ -270,7 +285,7 @@ def guide_profile_edit_view(request, guide_id):
             guide.start_date = form.cleaned_data['start_date']
             guide.career = form.cleaned_data['career']
             guide.save()
-            return redirect('guide_profile', guide_id=guide.id)  # Redirect to the guide profile page
+            return redirect('guideprofile/', guide_id=guide.id)  # Redirect to the guide profile page
     else:
         form = GuideProfileEditForm(initial={'start_date': guide.start_date, 'career': guide.career})
 
@@ -280,3 +295,24 @@ def guide_profile_edit_view(request, guide_id):
     }
 
     return render(request, 'guide_profile_edit.html', context)
+
+
+# 회원가입 후 회원 구분
+def account_create_view(request):
+    if request.method == 'GET': # 디지털 약자입니다 선택할 경우
+        return render(request, '')
+
+    elif request.method == 'POST': # 안내사입니다 선택할 경우
+        form = GuideCreateForm()
+        context = {'form' : form}
+        return render(request, 'GuideCreate.html', context)
+    
+    else:
+        form = GuideCreateForm(request.POST)
+
+        if form.is_valid():
+            guide = form.save(commit=False)
+            guide.save()
+            return render(request, 'GuideProfile.html')
+        else:
+            return render(request, 'GuideCreate.html')

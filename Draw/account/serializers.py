@@ -29,6 +29,10 @@ class SignupSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+class GuideCreateSerializer(SignupSerializer):
+    class Meta:
+        model = Guide
+        
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
