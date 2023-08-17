@@ -3,8 +3,6 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 
-'''
-User = get_user_model()
 
 class Guide(models.Model):
     TERM_CHOICES = [ # 안내사 경력 기간 선택지
@@ -38,15 +36,12 @@ class Guide(models.Model):
     start_date = models.DateTimeField(verbose_name='안내사 첫 시작일', null=True)
     career = models.CharField(verbose_name='안내사 경력', choices=TERM_CHOICES, max_length=20, null=True, default='')
     location = models.CharField(verbose_name='안내사 활동 가능 지역', choices=LOCATION_CHOICES, max_length=20, null=True, default='')
-    
-class User(models.Model):
-    email = models.EmailField(null=True, default='')
-'''
+
 
 class UserManager(BaseUserManager):
     use_in_migrations: True
 
-    def create_user(self, user_id, password, email, nickname, introduce, profile_photo, **kwargs):
+    def create_user(self, user_id, password, email, nickname, introduce, profile_photo, gender, **kwargs):
         """
         주어진 개인정보로 일반 User 인스턴스 생성
         """       
@@ -59,6 +54,7 @@ class UserManager(BaseUserManager):
             nickname = nickname,
             introduce = introduce,
             profile_photo = profile_photo,
+            gender = gender
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -92,6 +88,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     introduce = models.CharField(blank=True, null=True,  max_length=50)
     profile_photo = models.ImageField(blank=True, null=True,  max_length=400)
     last_login = models.DateField(auto_now=True, null=True)
+    gender = models.CharField(unique=True, null=True, max_length=10)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
