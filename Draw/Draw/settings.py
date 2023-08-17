@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.kakao',
 ]
 
+AUTH_USER_MODEL = 'account.User'
+
+
 # secret key -> secrets.json
 secret_file = os.path.join(BASE_DIR, 'secrets.json') #json 파일 위치를 명시
 secrets = None
@@ -205,7 +208,6 @@ SIMPLE_JWT = {
     'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',  # User 모델 연결
 }
 
-AUTH_USER_MODEL = 'account.User'
 
 CORS_ORIGIN_ALLOW_ALL = False
 
@@ -213,3 +215,9 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = ('http://127.0.0.1:8000', 'http://localhost:3000')
 
 CORS_ALLOW_CREDENTIALS = True
+
+
+AUTHENTICATION_BACKENDS = [
+    # ... 기존 설정 ...
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
