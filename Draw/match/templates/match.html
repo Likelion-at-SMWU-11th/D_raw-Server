@@ -1,19 +1,17 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
-  <head>
-  <meta charset="utf-8">
-    <title>HTML</title>
-    <style>
-      * {
-        font-size: 16px;
-        font-family: Consolas, sans-serif;
-      }
-    </style>
-  </head>
-  <body>
-    <form>
-      <p><input type="date"></p>
-      <p><input type="submit" value="Submit"></p>
-    </form>
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <form action="{% url 'check' %}", method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="다음">
+  </form>
+</body>
 </html>

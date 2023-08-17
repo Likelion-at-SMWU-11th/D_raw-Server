@@ -61,11 +61,11 @@ SECRET_KEY = secrets['SECRET_KEY']
 
 # 카카오 키들은 나중에 account.views 에서 쓰일 예정
 
-SOCIAL_OUTH_CONFIG = {
-    'KAKAO_REST_API_KEY':secrets['KAKAO_REST_API_KEY'],
-    'KAKAO_REDIRECT_URI':secrets['KAKAO_REDIRECT_URI'],
-    'KAKAO_SECRET_KEY': secrets['KAKAO_SECRET_KEY']
-}
+# SOCIAL_OUTH_CONFIG = { # 오류 때문에 주석 처리
+#     'KAKAO_REST_API_KEY':secrets['KAKAO_REST_API_KEY'],
+#     'KAKAO_REDIRECT_URI':secrets['KAKAO_REDIRECT_URI'],
+#     'KAKAO_SECRET_KEY': secrets['KAKAO_SECRET_KEY']
+# }
 
 kakao_login_uri = "https://kauth.kakao.com/oauth/authorize"
 kakao_token_uri = "https://kauth.kakao.com/oauth/token"
@@ -142,7 +142,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'ko'
+
+LANGUAGE_CODE = 'ko-kr' # 한국 시간으로 설정
 
 TIME_ZONE = 'Asia/Seoul'
 
