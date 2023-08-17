@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 # 이용자 정보 저장
-# @login_required
+@login_required
 def match(request):
     if request.method == "POST":
         form = MatchBasedForm(request.POST)
@@ -26,8 +26,13 @@ def match(request):
 
 # 매칭 방법 선택
 def check(request):
-    # 매칭 방법 이용자 정보에 저장하기
-    return render(request, 'check.html')
+    # 빠르게 찾기
+    if MatchUser.objects.get(method='quick'):
+        choice = '빠르게 찾기'
+    # 프로필 보고 찾기
+    else:
+        choice = '프로필 보고 찾기'
+    return render(request, 'check.html', { 'choice':choice })
 
 # 이용자 -> 안내사 빠르게 찾기
 class QuickList(APIView):
@@ -37,7 +42,7 @@ class QuickList(APIView):
     def get(self, request):
         # 이용자 장소 갖고 오기 -> 임의로 서울로 지정
         place = '서울특별시 용산구'
-        # place = User.objects.get
+        # place = User.objects.get(place=place)
         location = Guide.objects.get(location__contains = place)
         serializer = GuideModelSerializer(location, many=True)
         return Response(serializer.data)
@@ -64,7 +69,10 @@ class ProfileList(APIView):
         career = request.GET.get('career')
 
         if gender == '여성':
-            pass
+            Guide.objects.filter(gender='여성')
+        else:
+            Guide.objects.filter(gender='남성')
+
         if adult == '성인':
             pass
 
@@ -96,3 +104,11 @@ def search(request):
     # 제안받은매칭만
     # else:
     return render(request, 'search.html')
+
+# 내 매칭-이용자
+def mypage_user(request):
+    pass
+
+# 내 매칭-안내사
+def mypage_guide(request):
+    pass
