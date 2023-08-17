@@ -1,8 +1,10 @@
 from django.contrib import admin
-from .models import Guide
+from .models import User
 from django.core.paginator import Paginator
 
+admin.site.register(User)
 
+'''
 @admin.register(Guide)
 class PostModelAdmin(admin.ModelAdmin):
     list_display=['name', 'age', 'career', 'location', 'rate', 'start_date']
@@ -32,3 +34,4 @@ class ModelAdmin(PostModelAdmin):
     delete_selected_confirmation_template = None
     object_history_template = None
     popup_response_template = None
+'''

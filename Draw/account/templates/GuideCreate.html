@@ -8,14 +8,12 @@
 </head>
 <body>
     <h1> Guide Create 화면 </h1>
-    <form action="" method="POST" enctype="multipart/form-data">
+    <form action="{% url 'guideprofile' %}" method="POST" enctype="multipart/form-data">
     <div>
         {% csrf_token %}
         {{ form.as_p }}
     </div>
-    <div>
-        <input type="submit">
-    </div>
+    <input type="submit">
 </form>
 </body>
 </html>
