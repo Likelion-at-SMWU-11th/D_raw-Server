@@ -152,6 +152,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     ('10', '1994년'), 
     ('11', '1993년'), 
     ('12', '1992년')]
+
+    TERM_CHOICES = [
+        ('1', '3개월 미만'),
+        ('2', '3개월~6개월'),
+        ('3', '6개월~1년'),
+        ('4', '1년 이상'),
+    ]
+    LOCATION_CHOICES = [
+        ('1', '서울특별시'),
+        ('2', '부산광역시'),
+        # 나머지 선택지들…
+    ]
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='User') # 가이드 안내사 구분
     username = models.CharField(unique=True, blank=False, null=False, max_length=15) # 이름
     email = models.CharField(unique=True, blank=False, null=False, max_length=255) # 이메일
