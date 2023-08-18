@@ -5,7 +5,8 @@ from django.utils import timezone
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
-    def create_user(self, user_id, password, email, nickname, introduce, profile_photo, gender, **kwargs):
+    # nickname빼고 user_id는 다 username으로 대체
+    def create_user(self, username, password, email, introduce, profile_photo, gender, **kwargs):
         """
         주어진 개인정보로 일반 User 인스턴스 생성
         """
@@ -13,9 +14,9 @@ class UserManager(BaseUserManager):
             raise ValueError('Users must have an email address')
 
         user = self.model(
-            user_id=user_id,
+            username=username,
             email=self.normalize_email(email),  # 이메일 정규화
-            nickname = user_id,
+            # nickname = username,
             introduce=introduce,
             profile_photo=profile_photo,
             gender=gender,
@@ -24,13 +25,13 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, user_id, email, password, **extra_fields):
+    def create_superuser(self, username, email, password, **extra_fields):
         """
         주어진 개인정보로 관리자 User 인스턴스 생성
         최상위 사용자이므로 권한 부여
         """
         user = self.create_user(
-            user_id=user_id,
+            username=username,
             email=self.normalize_email(email),  # 이메일 정규화
             password=password,
             introduce=None,
@@ -47,9 +48,10 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     avatar = models.ImageField(upload_to="img/avatar/", blank=True, null=True)
-    user_id = models.CharField(unique=True, blank=False, null=False, max_length=15)
+    # user_id = models.CharField(unique=True, blank=False, null=False, max_length=15)
+    username = models.CharField(unique=True, blank=False, null=False, max_length=15)
     email = models.EmailField(unique=True, blank=False, null=False, max_length=255)  # EmailField 사용
-    nickname = models.CharField(unique=True, blank=False, null=False, max_length=15)
+    # nickname = models.CharField(unique=True, blank=False, null=False, max_length=15)
     introduce = models.CharField(blank=True, null=True, max_length=50)
     profile_photo = models.ImageField(blank=True, null=True, max_length=400)
     last_login = models.DateTimeField(auto_now=True, null=True)  # DateTimeField 수정
@@ -60,11 +62,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'user_id'
+    # USERNAME_FIELD = 'user_id'
+    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']  # 'email' 추가
 
     def __str__(self):
-        return self.user_id
+        # return self.user_id
+        return self.username
 
 class Guide(models.Model):
     TERM_CHOICES = [

@@ -6,51 +6,83 @@ from django.db.models import QuerySet
 
 from .models import MatchUser
 from account.models import User, Guide
-from .forms import MatchBasedForm
+from .forms import MatchBasedForm, Choice
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 from account.serializers import SignupSerializer
+import requests
 
 # 이용자 정보 저장
-@login_required
+# @login_required
+# def match(request):
+#     if request.method == "POST":
+#         form = MatchBasedForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('check.html')
+#     else:
+#         form = MatchBasedForm()
+#     return render(request, 'match.html', {'form' : form})
+
+# @login_required 일단 주석처리
 def match(request):
     if request.method == "POST":
         form = MatchBasedForm(request.POST)
         if form.is_valid():
-            form.save()
+            form_instance = form.save(commit=False)  # 폼 객체를 임시로 생성하지만 데이터베이스에는 아직 저장하지 않음
+            access_token = request.user.profile.kakao_access_token  # 사용자의 카카오 액세스 토큰을 가져오는 예시 코드
+
+            # 카카오 API에서 사용자 정보 얻기
+            kakao_api_endpoint = "https://kapi.kakao.com/v2/user/me"
+            headers = {
+                "Authorization": f"Bearer {access_token}"
+            }
+            response = requests.get(kakao_api_endpoint, headers=headers)
+            user_data = response.json()
+
+            # 사용자의 닉네임 가져와서 폼에 저장
+            user_nickname = user_data.get("properties", {}).get("nickname")
+            form_instance.user_nickname = user_nickname
+
+            form_instance.save()  # 변경된 폼 객체를 데이터베이스에 저장
             return redirect('check.html')
     else:
         form = MatchBasedForm()
-    return render(request, 'match.html', {'form' : form})
+    return render(request, 'match.html', {'form': form})
 
 # 매칭 방법 선택
 def check(request):
-    # 빠르게 찾기
-    if MatchUser.objects.get(method='quick'):
-        choice = '빠르게 찾기'
-    # 프로필 보고 찾기
-    else:
-        choice = '프로필 보고 찾기'
-    return render(request, 'check.html', { 'choice':choice })
+    if request.method == "GET":
+        method = request.GET.get('check')
+        # 빠르게 찾기
+        if method == "빠르게 찾기":
+            form = Choice(initial={'method': 'quick'})
+        # 프로필 보고 찾기
+        else:
+            form = Choice(initial={'method': 'profile'})
+        return render(request, 'check.html', {'form': form})
+    return render(request, 'check.html')
 
 # 이용자 -> 안내사 빠르게 찾기
 class QuickList(APIView):
     def get_object(self, pk):
         return get_object_or_404(Guide, pk=pk)
     
-    def get(self, request):
-        # 이용자 장소 갖고 오기 -> 임의로 서울로 지정
-        place = '서울특별시 용산구'
-        # place = User.objects.get(place=place)
-        location = Guide.objects.get(location__contains = place)
-        serializer = SignupSerializer(location, many=True)
+    def get(self, request): # 정보 가져오기
+        user = request.user
+        user_place = user.place
+
+        filtered_place = Guide.objects.filter(location__contains=user_place)
+        serializer = SignupSerializer(filtered_place, many=True)
         return Response(serializer.data)
-    
+
     def put(self, request, pk): # 신청정보 수정
-        guide = self.get_object(pk)
+        user = request.user
+        guide = get_object_or_404(Guide, pk=pk, user=user)
+
         serializer = SignupSerializer(guide, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -58,7 +90,11 @@ class QuickList(APIView):
         return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request, pk): # 취소하기
-        guide = self.get_object(pk)
+        # 로그인한 정보 가져오기
+        user = request.user
+
+        # Guide모델에서 해당 사용자의 정보 가져오기
+        guide = self.get_object(pk=pk, user=user)
         guide.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
