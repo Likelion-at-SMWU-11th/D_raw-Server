@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate
 from django.core.files.base import ContentFile
 from rest_framework import status
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -10,23 +10,9 @@ from rest_framework.response import Response
 from Draw.settings import SOCIAL_OUTH_CONFIG
 import requests, json
 from .models import User, Guide
-from django.contrib.auth import authenticate
 from .serializers import SignupSerializer, UserSerializer, BestGuideSerializer
 from .forms import GuideCreateForm, GuideProfileEditForm
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.contrib.auth import login
-from django.core.files.base import ContentFile
-from rest_framework import status
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from Draw.settings import SOCIAL_OUTH_CONFIG
-import requests, json
-from .models import User
-from django.contrib.auth import authenticate
-
 from .serializers import SignupSerializer, UserSerializer
 
 class JWTSignupView(APIView):
@@ -58,7 +44,7 @@ class JWTSignupView(APIView):
 class JWTLoginView(APIView):
     def post(self, request):
         user = authenticate(
-            user_id=request.data.get("user_id"), password=request.data.get("password")
+            username=request.data.get("username"), password=request.data.get("password")
         )
         if user is not None:
             serializer = UserSerializer(user)
@@ -109,22 +95,21 @@ class KakaoCallBackView(APIView):
         profile_json = profile_req.json()
         email = profile_json.get("kakao_account").get("email") # email 값
         properties = profile_json.get("kakao_account").get("profile")
-        nickname = properties.get("nickname") # 이름값
         profile_photo = properties.get("profile_image_url") # 프로필 사진
+        username = profile_json.get("kakao_account").get("username") #사용자 이름
 
         try: # DB에 email이 존재하는지 확인
             user = User.objects.get(email=email)
         except User.DoesNotExist: # DB에 없다면 계정 생성
             user = User.objects.create(
-                user_id = email.split(sep='@')[0],
+                username = email.split(sep='@')[0],
                 email = email,
-                nickname = nickname,
             )
             user.save()
             if profile_photo is not None: # kakao profile에 image가 있다면
                 profile_photo_req = requests.get(profile_photo)
                 user.avatar.save(
-                    f"{nickname}-avatar", ContentFile(profile_photo_req.content)
+                    f"{username}-avatar", ContentFile(profile_photo_req.content)
                 )
         login(request, user)
         # jwt token 접근
@@ -133,7 +118,7 @@ class KakaoCallBackView(APIView):
         jwt_access_token = str(token.access_token)
         res = Response(
             {
-                "user": nickname,
+                "user": username,
                 "email": email,
                 "profile_photo": profile_photo,
                 "message": "카카오 로그인에 성공하였습니다.",
@@ -148,88 +133,11 @@ class KakaoCallBackView(APIView):
         res.set_cookie("refresh", jwt_refresh_token, httponly=True)
         
         return res
-   
-'''
-# 회원가입 관련 View
-def index(request):
-    _context = {'check':False}
-    if request.session.get('access_token'):
-        _context['check'] = True
-    return render(request, 'index.html', _context)
-
-@api_view(['GET'])
-@permission_classes([AllowAny, ])
-def kakaoLoginLogic(request):
-    _restApiKey = 'd8fd6327b24b302b1d20f0690b10d3f4'
-    _redirectUrl = 'http://127.0.0.1:8000/kakaoLoginLogicRedirect'
-    _url = f'https://kauth.kakao.com/oauth/authorize?client_id={_restApiKey}&redirect_uri={_redirectUrl}&response_type=code'  
-    return redirect(_url)
-
-def kakaoLoginLogicRedirect(request):
-    _qs = request.GET['code']
-    _restApiKey = 'd8fd6327b24b302b1d20f0690b10d3f4' 
-    _redirect_uri = 'http://127.0.0.1:8000/kakaoLoginLogicRedirect'
-    _url = f'https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={_restApiKey}&redirect_uri={_redirect_uri}&code={_qs}'
-    _res = requests.post(_url)
-    _result = _res.json()
-    request.session['access_token'] = _result['access_token']
-    request.session.modified = True
-    return render(request, 'loginSuccess.html')
-
-def kakaoLogout(request):
-    _token = request.session['access_token']
-    _url = 'https://kapi.kakao.com/v1/user/logout'
-    _header = {
-      'Authorization': f'bearer {_token}'
-    }
-    # _url = 'https://kapi.kakao.com/v1/user/unlink'
-    # _header = {
-    #   'Authorization': f'bearer {_token}',
-    # }
-    _res = requests.post(_url, headers=_header)
-    _result = _res.json()
-    if _result.get('id'):
-        del request.session['access_token']
-        return render(request, 'loginoutSuccess.html')
-    else:
-        return render(request, 'logoutError.html')
-
-class KakaoSignInCallBackView(View):
-    def get (self, request):
-        auth_code = request. GET. get ( 'code')
-        kakao_token_api = 'https://kauth.kakao.com/oauth/token'
-        data = {
-            'grant_type': 'authorization code',
-            'client id' :'d8fd6327b24b302b1d20f0690b10d3f4',
-            'redirection_uri': 'http://localhost:8000/users/signin/kakao/callback',
-            'code': auth_code,
-        }
-        token_response = requests.post(kakao_token_api, data=data)
-        access_token = token_response.json().get('access_token')
-        user_info_response = request.get('https://kapi.kakao.com/v2/user/me', headers={"Authorization":f'Bearer ${access_token}'})
-
-        return JsonResponse({"user_info": user_info_response.json()})
-
-def methodsCheck(request, id):
-    if(request.method == 'GET'):
-        print(f"GET QS : {request.GET.get('data', '')}")
-        print(f"GET Dynamic Path : {id}")
-    
-    # PostMan으로 Localhost 테스트를 위해 CSRF 해제
-    # project/settings.py 파일에서 
-    # MIDDLEWARE -> 'django.middleware.csrf.CsrfViewMiddleware' 주석 처리
-    elif(request.method == 'POST'):
-        print(f"POST QS : {request.GET.get('data', '')}")
-        print(f"POST Dynamic Path : {id}")
-        return HttpResponse("POST Request.", content_type="text/plain")
-    return render(request, 'methodGet.html')
-'''
-
 ## 안내사 관련 View
 #우수 안내사 View
 def BestGuide(request):
     bestguidelist = Guide.objects.all().order_by('rate')
-    serializer_class = BestGuideSerializer
+    serializer = BestGuideSerializer()
     context = {
         'bestguidelist' : bestguidelist
     }

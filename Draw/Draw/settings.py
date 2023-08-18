@@ -7,6 +7,9 @@ from django.core.exceptions import ImproperlyConfigured
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+MEDIA_URL =  '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -79,7 +82,9 @@ SITE_ID = 2 #django admin 사이트 접속 시 에러나는 것 방지
 LOGIN_REDIRECT_URL ='/' #로그인 후 리다이렉트 될 경로
 #ACCOUNT_LOGOUT_REDIRECT_URL = reverse_lazy('account:login')
 ACCOUNT_LOGOUT_ON_GET = True
-
+ACCOUNT_AUTHENTICATION_METHOD = 'user_id'
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USER_MODEL_USERNAME_FILED = None
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -89,6 +94,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'Draw.urls'
@@ -219,5 +225,5 @@ CORS_ALLOW_CREDENTIALS = True
 
 AUTHENTICATION_BACKENDS = [
     # ... 기존 설정 ...
-    'allauth.account.auth_backends.AuthenticationBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',# settings.py
 ]
