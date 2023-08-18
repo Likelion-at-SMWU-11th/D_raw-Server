@@ -12,7 +12,7 @@ urlpatterns = [
     path('signup/', JWTSignupView.as_view()), # 회원가입
     path('login/', JWTLoginView.as_view()), # 로그인
     path('login/refresh/', TokenRefreshView.as_view()), # 토큰 재발급
-    path('accounts/kakao/accesstoken/<str:auth_code>', KakaoCallBackView.as_view()),
+    path('account/kakao/accesstoken/<str:auth_code>', KakaoCallBackView.as_view()),
 
     #guide url
     path('bestguide/', views.BestGuide),

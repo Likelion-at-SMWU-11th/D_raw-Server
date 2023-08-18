@@ -1,15 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
-from django.utils import timezone
+
+from django.db import models
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 
 class UserManager(BaseUserManager):
-    use_in_migrations = True
+    use_in_migrations: True
 
     # nickname빼고 user_id는 다 username으로 대체
     def create_user(self, username, password, email, introduce, profile_photo, gender, **kwargs):
+
         """
         주어진 개인정보로 일반 User 인스턴스 생성
-        """
+        """       
         if not email:
             raise ValueError('Users must have an email address')
 
@@ -31,13 +34,12 @@ class UserManager(BaseUserManager):
         최상위 사용자이므로 권한 부여
         """
         user = self.create_user(
-            username=username,
-            email=self.normalize_email(email),  # 이메일 정규화
-            password=password,
-            introduce=None,
-            profile_photo=None,
-            gender='male',
-            **extra_fields
+
+            username = username,
+            email = email,
+            password = password,
+            introduce = None,
+            profile_photo = None,
         )
 
         user.is_staff = True
@@ -48,23 +50,27 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     avatar = models.ImageField(upload_to="img/avatar/", blank=True, null=True)
-    # user_id = models.CharField(unique=True, blank=False, null=False, max_length=15)
     username = models.CharField(unique=True, blank=False, null=False, max_length=15)
-    email = models.EmailField(unique=True, blank=False, null=False, max_length=255)  # EmailField 사용
-    # nickname = models.CharField(unique=True, blank=False, null=False, max_length=15)
-    introduce = models.CharField(blank=True, null=True, max_length=50)
-    profile_photo = models.ImageField(blank=True, null=True, max_length=400)
-    last_login = models.DateTimeField(auto_now=True, null=True)  # DateTimeField 수정
-    gender = models.CharField(null=True, max_length=10)
+    email = models.CharField(unique=True, blank=False, null=False, max_length=255)
+    introduce = models.CharField(blank=True, null=True,  max_length=50)
+    profile_photo = models.ImageField(blank=True, null=True,  max_length=400)
+    last_login = models.DateField(auto_now=True, null=True)
+
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.username
+
+    # 헬퍼 클래스 사용
     objects = UserManager()
 
-    # USERNAME_FIELD = 'user_id'
+    # 사용자의 username field는 user id로 설정
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']  # 'email' 추가
+    # 필수 작성 field
+    REQUIRED_FIELDS = ['email']
+
 
     def __str__(self):
         # return self.user_id
