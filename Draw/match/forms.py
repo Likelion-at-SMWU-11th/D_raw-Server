@@ -1,23 +1,24 @@
 from django import forms
 from .models import MatchUser
+from account.models import User
 
-class DateInput(forms.DateInput):
-    input_type = 'date'
+# class DateInput(forms.DateInput):
+#     input_type = 'date'
 
-class Choice(forms.ModelForm):
-    class Meta:
-        model = MatchUser
-        fields = ['method']
+# class Choice(forms.ModelForm):
+#     class Meta:
+#         model = MatchUser
+#         fields = ['method']
 
 class MatchBasedForm(forms.ModelForm):
-    choices = forms.MultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple,
-        choices=MatchUser.LIST_CHOICES,
-    )
+    # choices = forms.MultipleChoiceField(
+    #     widget=forms.CheckboxSelectMultiple,
+    #     choices=MatchUser.LIST_CHOICES,
+    # )
     
-    date = forms.DateField(widget=DateInput)
+    # date = forms.DateField(widget=DateInput)
     class Meta:
-        model = MatchUser
+        model = User
         fields = ['time_choice', 'start_hour', 'place',
                   'blind', 'birth', 'gender', 'prefer_gender',
                   'plus', 'care']

@@ -8,10 +8,10 @@
 </head>
 
 <body>
-  <form action="{% url 'check' %}", method="post">
+  <form action="{% url 'match' %}" method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    <input type="text" name="place">
     <input type="submit" value="다음">
-  </form>
+</form>
 </body>
 </html>

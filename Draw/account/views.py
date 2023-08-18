@@ -151,13 +151,16 @@ def role_select(request):
 
             if user_type == 'guide':
                 user.role = 'Guide'
+                user.save()
+                return render(request, 'GuideProfile.html')
             elif user_type == 'user':
                 user.role = 'User'
-            user.save()
-            return render(request, 'GuideProfile.html')
+                user.save()
+                return render(request, 'match.html', {'form':form})
+            
     else:
         form = UserTypeForm()
-    return render(request, 'user_type_selection.html', {'form':form})
+        return render(request, 'user_type_selection.html', {'form':form})
     
     
 
