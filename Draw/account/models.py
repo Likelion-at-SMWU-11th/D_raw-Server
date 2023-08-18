@@ -8,7 +8,7 @@ class UserManager(BaseUserManager):
     use_in_migrations: True
 
     # nickname빼고 user_id는 다 username으로 대체
-    def create_user(self, username, password, email, introduce, profile_photo, gender, **kwargs):
+    def create_user(self, username, password, email, introduce, profile_photo, **kwargs):
 
         """
         주어진 개인정보로 일반 User 인스턴스 생성
@@ -22,7 +22,7 @@ class UserManager(BaseUserManager):
             # nickname = username,
             introduce=introduce,
             profile_photo=profile_photo,
-            gender=gender,
+            # gender=gender,
         )
         user.set_password(password)
         user.save(using=self._db)
