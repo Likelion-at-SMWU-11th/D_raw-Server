@@ -13,7 +13,7 @@ class MatchUser(models.Model):
     )
 
     # 시간
-    start_time_period = models.CharField(
+    time_choice = models.CharField(
         max_length=2,
         choices=[
             ('AM', '오전'),
@@ -22,16 +22,6 @@ class MatchUser(models.Model):
         default=''
     )
     start_hour = models.IntegerField(choices=[(i, i) for i in range(1, 13)])
-
-    finish_time_period = models.CharField(
-        max_length=2,
-        choices=[
-            ('AM', '오전'),
-            ('PM', '오후')
-        ],
-        default=''
-    )
-    finish_hour = models.IntegerField(choices=[(i, i) for i in range(1, 13)])
 
     # 장소
     place = models.TextField(verbose_name='place')
