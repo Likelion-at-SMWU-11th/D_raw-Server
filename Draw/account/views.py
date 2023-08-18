@@ -159,6 +159,7 @@ def role_select(request):
         form = UserTypeForm()
     return render(request, 'user_type_selection.html', {'form':form})
     
+    
 
 #우수 안내사 View
 def BestGuide(request):
