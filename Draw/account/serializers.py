@@ -10,20 +10,21 @@ class SignupSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data): # 회원가입
-        user_id = validated_data.get('user_id')
+        username = validated_data.get('username')
         password = validated_data.get('password')
         email = validated_data.get('email')
-        nickname = validated_data.get('nickname')
+        # nickname = validated_data.get('nickname')
         introduce = validated_data.get('introduce')
         profile_photo = validated_data.get('profile_photo')
-        gender = validated_data.get('gender')
+        # gender = validated_data.get('gender')
         user = User(
-            user_id = user_id,
+            #user_id = user_id,
+            username=username,
             email = email,
-            nickname = nickname,
+            #nickname = nickname,
             introduce = introduce,
             profile_photo = profile_photo,
-            gender = gender,
+            # gender = gender,
         )
         user.set_password(password)
         user.save()
