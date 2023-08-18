@@ -9,11 +9,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from Draw.settings import SOCIAL_OUTH_CONFIG
 import requests, json
-from .models import User, Guide
+from .models import User, Guide, UserManager
 from .serializers import SignupSerializer, UserSerializer, BestGuideSerializer
-from .forms import GuideCreateForm, GuideProfileEditForm
+from .forms import GuideCreateForm, GuideProfileEditForm, UserTypeForm
 from django.http import JsonResponse
 from .serializers import SignupSerializer, UserSerializer
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 
 class JWTSignupView(APIView):
     def post(self, request):
@@ -97,6 +99,7 @@ class KakaoCallBackView(APIView):
         properties = profile_json.get("kakao_account").get("profile")
         profile_photo = properties.get("profile_image_url") # 프로필 사진
         username = profile_json.get("kakao_account").get("username") #사용자 이름
+        gender = profile_json.get("kakao_account").get("gender") #성별
 
         try: # DB에 email이 존재하는지 확인
             user = User.objects.get(email=email)
@@ -121,6 +124,7 @@ class KakaoCallBackView(APIView):
                 "user": username,
                 "email": email,
                 "profile_photo": profile_photo,
+                "gender": gender,
                 "message": "카카오 로그인에 성공하였습니다.",
                 "token": {
                     "access": jwt_access_token,
@@ -132,16 +136,39 @@ class KakaoCallBackView(APIView):
         res.set_cookie("access", jwt_access_token, httponly=True)
         res.set_cookie("refresh", jwt_refresh_token, httponly=True)
         
-        return res
+        #return res
+        return redirect('role-selection', auth_code=auth_code)
+
 ## 안내사 관련 View
+
+def role_select(request):
+    if request.method == 'POST':
+        form = UserTypeForm(request.POST)
+
+        if form.is_valid():
+            user_type = form.cleaned_data['user_type']
+            user = request.user
+
+            if user_type == 'guide':
+                user.role = 'Guide'
+            elif user_type == 'user':
+                user.role = 'User'
+            user.save()
+            return render(request, 'GuideProfile.html')
+    else:
+        form = UserTypeForm()
+    return render(request, 'user_type_selection.html', {'form':form})
+    
+
 #우수 안내사 View
 def BestGuide(request):
-    bestguidelist = Guide.objects.all().order_by('rate')
+    bestguidelist = User.objects.filter(role='Guide').order_by('rate')
     serializer = BestGuideSerializer()
     context = {
         'bestguidelist' : bestguidelist
     }
     return render(request, 'BestGuide.html', context)
+
 
 # 안내사 프로필 생성 View
 def guide_create_form_view(request):
@@ -152,10 +179,8 @@ def guide_create_form_view(request):
     
     else:
         form = GuideCreateForm(request.POST)
-
         if form.is_valid():
             guide = form.save(commit=False)
-            guide.rate = int(form.cleaned_data['rate'])  # 입력된 rate 데이터를 숫자로 변환하여 할당
             guide.save()
             return render(request, 'GuideProfile.html')
         else:
@@ -163,7 +188,7 @@ def guide_create_form_view(request):
 
 # 안내사 활동지역 View
 def guide_location_form_view(request):
-    if request.method == 'GET':
+    if request.method == 'GET' and request.user.role == 'Guide':
         form = GuideCreateForm()
         context = {'form' : form}
         return render(request, 'GuideLocation.html', context)
@@ -187,7 +212,7 @@ def guide_profile_view(request):
 def guide_profile_edit_view(request, guide_id):
     guide = Guide.objects.get(pk=guide_id)
 
-    if request.method == 'POST':
+    if request.method == 'POST' and request.user.role == 'Guide':
         form = GuideProfileEditForm(request.POST)
         if form.is_valid():
             guide.start_date = form.cleaned_data['start_date']
@@ -203,24 +228,3 @@ def guide_profile_edit_view(request, guide_id):
     }
 
     return render(request, 'guide_profile_edit.html', context)
-
-
-# 회원가입 후 회원 구분
-def account_create_view(request):
-    if request.method == 'GET': # 디지털 약자입니다 선택할 경우
-        return render(request, '')
-
-    elif request.method == 'POST': # 안내사입니다 선택할 경우
-        form = GuideCreateForm()
-        context = {'form' : form}
-        return render(request, 'GuideCreate.html', context)
-    
-    else:
-        form = GuideCreateForm(request.POST)
-
-        if form.is_valid():
-            guide = form.save(commit=False)
-            guide.save()
-            return render(request, 'GuideProfile.html')
-        else:
-            return render(request, 'GuideCreate.html')

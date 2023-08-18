@@ -36,5 +36,8 @@ class GuideCreateForm(forms.Form):
 
 class GuideProfileEditForm(GuideCreateForm):
     class Meta:
-        model = Guide
+        model = User
         fields = ['start_date', 'career']
+
+class UserTypeForm(forms.Form):
+    user_type = forms.ChoiceField(choices=[('guide', '안내사'), ('user', '서비스 이용자')])

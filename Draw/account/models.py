@@ -7,7 +7,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Permis
 class UserManager(BaseUserManager):
     use_in_migrations: True
 
-    def create_user(self, username, password, email, introduce, profile_photo, **kwargs):
+    def create_user(self, username, password, email, introduce, profile_photo, gender, **kwargs):
         """
         주어진 개인정보로 일반 User 인스턴스 생성
         """       
@@ -19,6 +19,7 @@ class UserManager(BaseUserManager):
             email = email,
             introduce = introduce,
             profile_photo = profile_photo,
+            gender = gender,
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -44,12 +45,31 @@ class UserManager(BaseUserManager):
         return user
 
 class User(AbstractBaseUser, PermissionsMixin):
-    avatar = models.ImageField(upload_to="img/avatar/", blank=True, null=True)
-    username = models.CharField(unique=True, blank=False, null=False, max_length=15)
-    email = models.CharField(unique=True, blank=False, null=False, max_length=255)
-    introduce = models.CharField(blank=True, null=True,  max_length=50)
-    profile_photo = models.ImageField(blank=True, null=True,  max_length=400)
-    last_login = models.DateField(auto_now=True, null=True)
+    ROLE_CHOICES = (
+        ('user', 'User'),
+        ('guide', 'Guide'),
+    )
+    TERM_CHOICES = [
+        ('1', '3개월 미만'),
+        ('2', '3개월~6개월'),
+        ('3', '6개월~1년'),
+        ('4', '1년 이상'),
+    ]
+    LOCATION_CHOICES = [
+        ('1', '서울특별시'),
+        ('2', '부산광역시'),
+        # 나머지 선택지들...
+    ]
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user') # 가이드 안내사 구분
+    username = models.CharField(unique=True, blank=False, null=False, max_length=15) # 이름
+    email = models.CharField(unique=True, blank=False, null=False, max_length=255) # 이메일
+    profile_photo = models.ImageField(blank=True, null=True,  max_length=400) # 프로필 사진 
+    gender = models.CharField(blank=True, null=True, max_length=10) # 성별
+    age = models.IntegerField(verbose_name='나이', null=True, default=0) # 나이
+    rate = models.IntegerField(verbose_name='받은 칭찬도장 개수', null=True) # 가이드 - 받은 도장 개수
+    start_date = models.DateTimeField(auto_now = False, verbose_name='안내사 첫 시작일', null=True) # 가이드 - 안내사 첫 활동일
+    career = models.CharField(verbose_name='안내사 경력', choices=TERM_CHOICES, max_length=20, null=True, default='') # 가이드 - 경력
+    location = models.CharField(verbose_name='안내사 활동 가능 지역', choices=LOCATION_CHOICES, max_length=20, null=True, default='') # 가이드 - 활동 가능 지역
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -78,6 +98,7 @@ class Guide(models.Model):
         ('2', '부산광역시'),
         # 나머지 선택지들...
     ]
+
     name = models.CharField(verbose_name='안내사 이름', max_length=5, null=True, default='')
     age = models.IntegerField(verbose_name='나이', null=True, default=0)
     rate = models.IntegerField(verbose_name='받은 칭찬도장 개수', null=True)

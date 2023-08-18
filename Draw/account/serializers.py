@@ -31,7 +31,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
 class GuideCreateSerializer(SignupSerializer):
     class Meta:
-        model = Guide
+        model = User
         
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -40,5 +40,5 @@ class UserSerializer(serializers.ModelSerializer):
 
 class BestGuideSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Guide 
+        model = User
         fields = ['rate']
