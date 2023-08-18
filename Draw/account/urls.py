@@ -16,6 +16,7 @@ urlpatterns = [
     path('role/', role_select, name='role-select'), #guide인지 user인지 설정
     #guide url
     path('bestguide/', views.BestGuide),
-    path('guideedit/<int:guide_id>/', guide_profile_edit_view, name='guide-profile-edit'),
     path('guideprofile/', guide_profile_view, name='guide-profile'),
+    path('update_guide_career/', views.update_guide_career, name='update_guide_career'),
+    path('create_guide_profile', views.guide_create_form_view, name = 'create-guide'),
     ]

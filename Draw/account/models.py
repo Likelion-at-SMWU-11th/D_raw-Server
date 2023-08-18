@@ -139,23 +139,25 @@ class User(AbstractBaseUser, PermissionsMixin):
     care = models.CharField(max_length=300, blank=True, null=True)
 
     # 안내사 관련 필드
-    TERM_CHOICES = [
-        ('1', '3개월 미만'),
-        ('2', '3개월~6개월'),
-        ('3', '6개월~1년'),
-        ('4', '1년 이상'),
-    ]
-    LOCATION_CHOICES = [
-        ('1', '서울특별시'),
-        ('2', '부산광역시'),
-        # 나머지 선택지들...
-    ]
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user') # 가이드 안내사 구분
+    AGE_CHOICES = [('1', '2003년'), 
+    ('2', '2002년'), 
+    ('3', '2001년'), 
+    ('4', '2000년'), 
+    ('5', '1999년'), 
+    ('6', '1998년'), 
+    ('7', '1997년'), 
+    ('8', '1996년'), 
+    ('9', '1995년'), 
+    ('10', '1994년'), 
+    ('11', '1993년'), 
+    ('12', '1992년')]
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='User') # 가이드 안내사 구분
     username = models.CharField(unique=True, blank=False, null=False, max_length=15) # 이름
     email = models.CharField(unique=True, blank=False, null=False, max_length=255) # 이메일
     profile_photo = models.ImageField(blank=True, null=True,  max_length=400) # 프로필 사진 
     gender = models.CharField(blank=True, null=True, max_length=10) # 성별
-    age = models.IntegerField(verbose_name='나이', null=True, default=0) # 나이
+    age = models.IntegerField(verbose_name='나이', choices = AGE_CHOICES, null=True, default=0) # 나이
     rate = models.IntegerField(verbose_name='받은 칭찬도장 개수', null=True) # 가이드 - 받은 도장 개수
     start_date = models.DateTimeField(auto_now = False, verbose_name='안내사 첫 시작일', null=True) # 가이드 - 안내사 첫 활동일
     career = models.CharField(verbose_name='안내사 경력', choices=TERM_CHOICES, max_length=20, null=True, default='') # 가이드 - 경력

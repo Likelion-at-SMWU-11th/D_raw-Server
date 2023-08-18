@@ -11,11 +11,12 @@ from Draw.settings import SOCIAL_OUTH_CONFIG
 import requests, json
 from .models import User, Guide, UserManager
 from .serializers import SignupSerializer, UserSerializer, BestGuideSerializer
-from .forms import GuideCreateForm, GuideProfileEditForm, UserTypeForm
+from .forms import GuideCreateForm, GuideProfileEditForm, UserTypeForm, GuideCareerForm, GuideProfileCreationForm
 from django.http import JsonResponse
 from .serializers import SignupSerializer, UserSerializer
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 class JWTSignupView(APIView):
     def post(self, request):
@@ -137,32 +138,25 @@ class KakaoCallBackView(APIView):
         res.set_cookie("refresh", jwt_refresh_token, httponly=True)
         
         #return res
-        return redirect('role-selection', auth_code=auth_code)
+        return redirect('role-select', auth_code=auth_code)
 
 ## 안내사 관련 View
-
+@login_required
 def role_select(request):
     if request.method == 'POST':
         form = UserTypeForm(request.POST)
-
         if form.is_valid():
-            user_type = form.cleaned_data['user_type']
-            user = request.user
-
-            if user_type == 'guide':
-                user.role = 'Guide'
+            new_role = form.cleaned_data['user_type']
+            if new_role in [choice[0] for choice in User.ROLE_CHOICES]:
+                user = request.user
+                user.role = new_role
                 user.save()
-                return render(request, 'GuideProfile.html')
-            elif user_type == 'user':
-                user.role = 'User'
-                user.save()
-                return render(request, 'match.html', {'form':form})
+                messages.success(request, 'User role has been updated successfully.')
+                return redirect('create-guide')
             
     else:
         form = UserTypeForm()
-        return render(request, 'user_type_selection.html', {'form':form})
-    
-    
+    return render(request, 'user_type_selection.html', {'form':form})
 
 #우수 안내사 View
 def BestGuide(request):
@@ -173,62 +167,44 @@ def BestGuide(request):
     }
     return render(request, 'BestGuide.html', context)
 
+# guide profile edit view
+def update_guide_career(request):
+    user = request.user
+    if request.method == 'POST':
+        form = GuideCareerForm(request.POST)
+        if form.is_valid() and user.role == 'guide':
+            new_career = form.cleaned_data['career_type']
+            user.career = new_career
+            user.save()
+            messages.success(request, 'User career has been updated successfully.')
+            return redirect('guide-profile')  # 수정 완료 후 프로필 페이지로 이동하거나 다른 페이지로 리디렉션
+    else:
+        form = GuideCareerForm(initial={'career_type': user.career})
+    context = {'form': form, 'user': request.user}
+
+    return render(request, 'update_guide_career.html', context)
+
 
 # 안내사 프로필 생성 View
 def guide_create_form_view(request):
-    if request.method == 'GET':
-        form = GuideCreateForm()
-        context = {'form' : form}
-        return render(request, 'GuideCreate.html', context)
-    
-    else:
-        form = GuideCreateForm(request.POST)
-        if form.is_valid():
-            guide = form.save(commit=False)
-            guide.save()
-            return render(request, 'GuideProfile.html')
-        else:
-            return render(request, 'GuideCreate.html')
-
-# 안내사 활동지역 View
-def guide_location_form_view(request):
+    user = request.user
     if request.method == 'GET' and request.user.role == 'Guide':
-        form = GuideCreateForm()
-        context = {'form' : form}
-        return render(request, 'GuideLocation.html', context)
-    
-    else:
-        form = GuideCreateForm(request.POST)
-
+        form = GuideProfileCreationForm(request.POST)
         if form.is_valid():
-            guide = form.save(commit=False)
-            guide.rate = int(form.cleaned_data['rate'])  # 입력된 rate 데이터를 숫자로 변환하여 할당
-            guide.save()
-            return render(request, 'index.html')
-        else:
-            return render(request, 'GuideLocation.html')
+            user.username = form.cleaned_data['username']
+            user.gender = form.cleaned_data['gender']
+            user.age = form.cleaned_data['age']
+            user.location = form.cleaned_data['location']
+            user.save()
+            messages.success(request, 'Guide profile has been updated successfully.')
+            return redirect('home')
+    else:
+        form = GuideProfileCreationForm()
+
+    return render(request, 'create_guide_profile.html', {'form':form})
+
 
 # 안내사 프로필 보여주기 View
 def guide_profile_view(request):
         return render(request, 'GuideProfile.html')
 
-# 안내사 프로필 수정 View
-def guide_profile_edit_view(request, guide_id):
-    guide = Guide.objects.get(pk=guide_id)
-
-    if request.method == 'POST' and request.user.role == 'Guide':
-        form = GuideProfileEditForm(request.POST)
-        if form.is_valid():
-            guide.start_date = form.cleaned_data['start_date']
-            guide.career = form.cleaned_data['career']
-            guide.save()
-            return redirect('guideprofile/', guide_id=guide.id)  # Redirect to the guide profile page
-    else:
-        form = GuideProfileEditForm(initial={'start_date': guide.start_date, 'career': guide.career})
-
-    context = {
-        'form': form,
-        'guide': guide,
-    }
-
-    return render(request, 'guide_profile_edit.html', context)
