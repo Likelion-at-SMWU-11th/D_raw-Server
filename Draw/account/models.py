@@ -88,6 +88,7 @@ class Guide(models.Model):
         ('2', '부산광역시'),
         # 나머지 선택지들...
     ]
+
     name = models.CharField(verbose_name='안내사 이름', max_length=5, null=True, default='')
     age = models.IntegerField(verbose_name='나이', null=True, default=0)
     rate = models.IntegerField(verbose_name='받은 칭찬도장 개수', null=True)
