@@ -153,7 +153,6 @@ def role_select(request):
                 user.save()
                 messages.success(request, 'User role has been updated successfully.')
                 return redirect('create-guide')
-            
     else:
         form = UserTypeForm()
     return render(request, 'user_type_selection.html', {'form':form})
@@ -192,9 +191,9 @@ def guide_create_form_view(request):
         form = GuideProfileCreationForm(request.POST)
         if form.is_valid():
             user.username = form.cleaned_data['username']
-            user.gender = form.cleaned_data['gender']
-            user.age = form.cleaned_data['age']
-            user.location = form.cleaned_data['location']
+            user.gender = form.cleaned_data['gender_type']
+            user.age = form.cleaned_data['age_type']
+            user.location = form.cleaned_data['location_type']
             user.save()
             messages.success(request, 'Guide profile has been updated successfully.')
             return redirect('home')
