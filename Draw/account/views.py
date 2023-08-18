@@ -157,7 +157,7 @@ def role_select(request):
     else:
         form = UserTypeForm()
     return render(request, 'user_type_selection.html', {'form':form})
-            
+
 #우수 안내사 View
 def BestGuide(request):
     bestguidelist = User.objects.filter(role='Guide').order_by('rate')

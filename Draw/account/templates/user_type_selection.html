@@ -15,8 +15,17 @@
     {% endif %}
 </body>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">선택</button>
+    {% if user.role == 'User' %}
+        <form action="{% url 'match' %}"method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">선택</button>
+        </form>
+    {% else %}
+        <form action="{% url 'GuideCreate' %}" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">선택</button>
+        </form>
+    {% endif %}
 </form>

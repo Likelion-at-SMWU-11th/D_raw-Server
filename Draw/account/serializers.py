@@ -22,7 +22,7 @@ class SignupSerializer(serializers.ModelSerializer):
             username=username,
             email = email,
             #nickname = nickname,
-            introduce = introduce,
+            # introduce = introduce,
             profile_photo = profile_photo,
             # gender = gender,
         )

@@ -6,7 +6,7 @@ from django.db.models import QuerySet
 
 from .models import MatchUser
 from account.models import User, Guide
-from .forms import MatchBasedForm, Choice
+# from .forms import MatchBasedForm, Choice
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,53 +16,53 @@ from account.serializers import SignupSerializer
 import requests
 
 # 이용자 정보 저장
-# @login_required
+@login_required
 def match(request):
-    if request.method == "POST":
-        form = MatchBasedForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('check.html')
-    else:
-        form = MatchBasedForm()
-    return render(request, 'match.html', {'form' : form})
+    if request.method == "POST" and request.user.role == 'User':
+        start_time = request.POST.get('start_time')
+        time_choice = request.POST.get('time_choice')
+        start_hour = request.POST.get('start_hour')
+        place = request.POST.get('place')
+        blind = request.POST.get('blind')
+        birth = request.POST.get('birth')
+        gender = request.POST.get('gender')
+        prefer_gender = request.POST.get('prefer_gender')
+        list = request.POST.get('list')
+        plus = request.POST.get('plus')
+        care = request.POST.get('care')
 
-# def match(request):
-#     if request.method == "POST":
-#         form = MatchBasedForm(request.POST)
-#         if form.is_valid():
-#             form_instance = form.save(commit=False)  # 폼 객체를 임시로 생성하지만 데이터베이스에는 아직 저장하지 않음
-#             access_token = request.user.profile.kakao_access_token  # 사용자의 카카오 액세스 토큰을 가져오는 예시 코드
-
-#             # 카카오 API에서 사용자 정보 얻기
-#             kakao_api_endpoint = "https://kapi.kakao.com/v2/user/me"
-#             headers = {
-#                 "Authorization": f"Bearer {access_token}"
-#             }
-#             response = requests.get(kakao_api_endpoint, headers=headers)
-#             user_data = response.json()
-
-#             # 사용자의 닉네임 가져와서 폼에 저장
-#             user_nickname = user_data.get("properties", {}).get("nickname")
-#             form_instance.user_nickname = user_nickname
-
-#             form_instance.save()  # 변경된 폼 객체를 데이터베이스에 저장
-#             return redirect('check.html')
-#     else:
-#         form = MatchBasedForm()
-#     return render(request, 'match.html', {'form': form})
+        user = request.user
+        user.start_time = start_time
+        user.time_choice = time_choice
+        user.start_hour = start_hour
+        user.place = place 
+        user.blind = blind
+        user.birth = birth
+        user.gender = gender
+        user.prefer_gender = prefer_gender
+        user.list = list
+        user.plus = plus
+        user.care = care
+        user.save()
+        return render(request, 'match.html', {'user' : user})
+    else: 
+        pass
 
 # 매칭 방법 선택
+@login_required
 def check(request):
-    if request.method == "GET":
+    if request.method == "GET" and request.user.role == 'User':
         method = request.GET.get('check')
-        # 빠르게 찾기
-        if method == "빠르게 찾기":
-            form = Choice(initial={'method': 'quick'})
-        # 프로필 보고 찾기
+        user = request.user
+
+        if method == '빠르게 찾기':
+            user.method = method
+            user.save()
+            return render(request, 'quick.html', {'user' : user})
         else:
-            form = Choice(initial={'method': 'profile'})
-        return render(request, 'check.html', {'form': form})
+            user.method = method
+            user.save()
+            return render(request, 'profile.html', {'user' : user})
     return render(request, 'check.html')
 
 # 이용자 -> 안내사 빠르게 찾기
@@ -154,12 +154,12 @@ class ProfileDetailList(APIView):
 # 안내사 -> 이용자 빠른/제안받은 매칭 보기
 def search(request):
     # 빠르게 매칭만
-    if MatchUser.objects.get(method='quick'):
-        choice = '빠르게 찾기'
+    if request.user.role == 'Guide':
+        user = User.objects.filter(method='quick')
     # 프로필 보고 찾기
     else:
-        choice = '프로필 보고 찾기'
-    return render(request, 'search.html', { 'choice':choice })
+        user = User.objects.filter(method='profile')
+    return render(request, 'search.html', {'user':user })
 
 # 내 매칭-이용자가 보는 화면
 class GuideList(APIView):
