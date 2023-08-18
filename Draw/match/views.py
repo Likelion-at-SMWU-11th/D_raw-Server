@@ -17,41 +17,40 @@ import requests
 
 # 이용자 정보 저장
 # @login_required
-# def match(request):
-#     if request.method == "POST":
-#         form = MatchBasedForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('check.html')
-#     else:
-#         form = MatchBasedForm()
-#     return render(request, 'match.html', {'form' : form})
-
-# @login_required 일단 주석처리
 def match(request):
     if request.method == "POST":
         form = MatchBasedForm(request.POST)
         if form.is_valid():
-            form_instance = form.save(commit=False)  # 폼 객체를 임시로 생성하지만 데이터베이스에는 아직 저장하지 않음
-            access_token = request.user.profile.kakao_access_token  # 사용자의 카카오 액세스 토큰을 가져오는 예시 코드
-
-            # 카카오 API에서 사용자 정보 얻기
-            kakao_api_endpoint = "https://kapi.kakao.com/v2/user/me"
-            headers = {
-                "Authorization": f"Bearer {access_token}"
-            }
-            response = requests.get(kakao_api_endpoint, headers=headers)
-            user_data = response.json()
-
-            # 사용자의 닉네임 가져와서 폼에 저장
-            user_nickname = user_data.get("properties", {}).get("nickname")
-            form_instance.user_nickname = user_nickname
-
-            form_instance.save()  # 변경된 폼 객체를 데이터베이스에 저장
+            form.save()
             return redirect('check.html')
     else:
         form = MatchBasedForm()
-    return render(request, 'match.html', {'form': form})
+    return render(request, 'match.html', {'form' : form})
+
+# def match(request):
+#     if request.method == "POST":
+#         form = MatchBasedForm(request.POST)
+#         if form.is_valid():
+#             form_instance = form.save(commit=False)  # 폼 객체를 임시로 생성하지만 데이터베이스에는 아직 저장하지 않음
+#             access_token = request.user.profile.kakao_access_token  # 사용자의 카카오 액세스 토큰을 가져오는 예시 코드
+
+#             # 카카오 API에서 사용자 정보 얻기
+#             kakao_api_endpoint = "https://kapi.kakao.com/v2/user/me"
+#             headers = {
+#                 "Authorization": f"Bearer {access_token}"
+#             }
+#             response = requests.get(kakao_api_endpoint, headers=headers)
+#             user_data = response.json()
+
+#             # 사용자의 닉네임 가져와서 폼에 저장
+#             user_nickname = user_data.get("properties", {}).get("nickname")
+#             form_instance.user_nickname = user_nickname
+
+#             form_instance.save()  # 변경된 폼 객체를 데이터베이스에 저장
+#             return redirect('check.html')
+#     else:
+#         form = MatchBasedForm()
+#     return render(request, 'match.html', {'form': form})
 
 # 매칭 방법 선택
 def check(request):
